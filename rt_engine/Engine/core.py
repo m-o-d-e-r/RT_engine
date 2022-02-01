@@ -1,4 +1,4 @@
-import numbers
+from numpy import kron
 from ..data_operations import Reader, AstReader, Writer
 import re
 
@@ -89,14 +89,17 @@ class Ast:
                     elif item_wood[1] == "VAR_PATTERN":
                         self.__queue_tree_item.push(args["".join(re.findall(r"[a-zA-Z_]*", item))])
                     elif item_wood[1] == "END_HTML_PATTERN":
-                        self.__queue.pop()
-                        if len(self.__queue.get) > 0:
-                            self._current_parrent = self.__queue.get[-1]
-                            self.__queue_tree_item.push(item)
-                            self._current_parrent.close_value = item
+                        self._current_parrent.close_value = item
+                        self.__queue_tree_item.push(item)
 
-        self.__queue_tree_item.push("</html>")
-        return (self._first_parrent, self.__queue_tree_item)
+                        self.__queue.pop()
+                        try:
+                            self._current_parrent = self.__queue.get[-1]
+                        except:
+                            pass
+
+
+        return (self._first_parrent, self.__queue_tree_item, self.__raw_wood_temp)
 
 
 class AstTemplate:
@@ -104,11 +107,15 @@ class AstTemplate:
         html_data = Reader(path)
         main_ast = Ast(html_data.tokens)
         ast_reader = AstReader(main_ast.generate_tree(kwargs))
-        index = []
-        for number, i in enumerate(html_data.tokens):
-            if number == 0:
-                continue
-            index.append(re.search(r"\s*<", i).end() - 1)
 
-        print(list(zip(ast_reader.show(), index)))
-        #Writer(ast_reader.show()).write()
+        ast_reader.show_tabs(main_ast._first_parrent)
+
+#        print()
+#        print("\n\t\tStack:\t", ast_reader.tabs_stack)
+#        print("="*100)
+#        print(ast_reader.show())
+#        print()
+#        print(main_ast._first_parrent.value, main_ast._first_parrent.close_value)
+
+
+        Writer(main_ast._first_parrent, ast_reader.show(), ast_reader.tabs_stack)
