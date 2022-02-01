@@ -1,4 +1,3 @@
-from numpy import kron
 from ..data_operations import Reader, AstReader, Writer
 import re
 
@@ -110,9 +109,9 @@ class AstTemplate:
 
         ast_reader.show_tabs(main_ast._first_parrent)
 
-#        print()
-#        print("\n\t\tStack:\t", ast_reader.tabs_stack)
-#        print("="*100)
+        print()
+        print("\n\t\tStack:\t", ast_reader.tabs_stack)
+        print("="*100)
 #        print(ast_reader.show())
 #        print()
 #        print(main_ast._first_parrent.value, main_ast._first_parrent.close_value)

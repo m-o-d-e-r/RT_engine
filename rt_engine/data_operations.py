@@ -44,7 +44,7 @@ class AstReader:
             for item_frame in child_item.child:
                 child_datas.append(item_frame)
 
-        self.__current_indent *= 2
+        self.__current_indent += 4
         self.tabs_stack.append([child_datas, self.__current_indent])
 
         if self.__count_of_stack_framess > 0:
@@ -79,5 +79,7 @@ class Writer:
                     elif html_item == frame.close_value:
                         file_.write(f"{' '*html_frame[1]}{html_item}\n")
                         break
+
+        file_.write("</html>\n")
 
         file_.close()
