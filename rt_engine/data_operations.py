@@ -70,15 +70,23 @@ class Writer:
 
         file_.write("<!DOCTYPE html>\n<html>\n")
 
+
         for html_item in data:
             for html_frame in tabs_stack:
+                is_break = False
                 for frame in html_frame[0]:
                     if html_item == frame.value:
                         file_.write(f"{' '*html_frame[1]}{html_item}\n")
+
+                        is_break = True
                         break
                     elif html_item == frame.close_value:
                         file_.write(f"{' '*html_frame[1]}{html_item}\n")
+
+                        is_break = True
                         break
+                if is_break:
+                    break
 
         file_.write("</html>\n")
 
