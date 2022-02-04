@@ -1,3 +1,4 @@
+from ast import arg
 from ..data_operations import Reader, AstReader, Writer
 import re
 
@@ -31,7 +32,12 @@ class AstNode:
 
 class AstDataNode:
     def __init__(self, data):
-        self.data = data        
+        self.value = data
+        self.id = None
+        self.child = []
+    
+    def __repr__(self) -> str:
+        return f"DataNode: {{{{{self.value}}}}}"
 
 
 class AstQueue:
@@ -61,6 +67,7 @@ class Ast:
         self.__queue = AstQueue()
         self.__queue_tree_item = AstQueue()
         self._html_stack = []
+        self._variables: dict = {}
 
     def __generate_raw_wood(self):
         raw_wood = []
@@ -96,12 +103,25 @@ class Ast:
                         else:
                             new_node = AstNode(item)
                             new_node.id = item_code
+
+                            if type(self._current_parrent) is AstDataNode:
+                                self.__queue.pop()
+                                self._current_parrent = self.__queue.get[-1]
+
                             self._current_parrent.add_child(new_node)
                             self._current_parrent = new_node
                             self.__queue.push(new_node)
                             self.__queue_tree_item.push(new_node.value)
                     elif item_wood[1] == "VAR_PATTERN":
                         name = "".join(re.findall("[a-zA-Z0-9_]*", item))
+                        self._variables.update({item_code: args.get(name)})
+
+                        data_node = AstDataNode(name)
+                        data_node.id = item_code
+
+                        self._current_parrent.add_child(data_node)
+                        self._current_parrent = data_node
+                        self.__queue.push(data_node)
                         self.__queue_tree_item.push(name)
                     elif item_wood[1] == "END_HTML_PATTERN":
                         self._current_parrent.close_value = item
@@ -109,6 +129,8 @@ class Ast:
                         self.__queue_tree_item.push(item)
 
                         self.__queue.pop()
+                        if type(self._current_parrent) is AstDataNode:
+                            self.__queue.pop()
                         try:
                             self._current_parrent = self.__queue.get[-1]
                         except:
@@ -127,6 +149,7 @@ class AstTemplate:
 
         ast_reader.show_tabs(main_ast._first_parrent, ast_reader.show())
 
+#        print(main_ast._variables)
 #        print()
 #        print("\n\t\tStack:\t", ast_reader.tabs_stack)
 #        print("="*100)
@@ -134,4 +157,4 @@ class AstTemplate:
 #        print()
 #        print(main_ast._first_parrent.value, main_ast._first_parrent.close_value)
 
-        Writer(main_ast._html_stack, ast_reader.tabs_stack)
+        Writer(main_ast, ast_reader.tabs_stack)

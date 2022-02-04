@@ -63,25 +63,40 @@ class AstReader:
 
 
 class Writer:
-    def __init__(self, data, tabs_stack):
-        self.write(data, tabs_stack)
+    def __init__(self, ast, tabs_stack):
+        self.__main_ast = ast
+        self.write(self.__main_ast, tabs_stack)
 
-    def write(self, data, tabs_stack):
+    def write(self, ast, tabs_stack):
         file_ = open("test.html", "w")
         file_.write("<!DOCTYPE html>\n<html>\n")
 
+#        print(ast._html_stack)
+#        print()
+#        print(tabs_stack)
 
-        for html_item in data:
+        for html_item in ast._html_stack:
             for tab_frame in tabs_stack:
                 if len(tab_frame) == 0:
                     break
                 for tab_item in tab_frame[0 : -1]:
-                    if html_item[1] == tab_item.id:
-                        file_.write(f"{' '*tab_frame[-1]}{html_item[0]}\n")
-                        break
-                    elif html_item[1] == tab_item.close_id:
-                        file_.write(f"{' '*tab_frame[-1]}{html_item[0]}\n")
-                        break
+                    try:
+                        if html_item[1] == tab_item.id:
+    #                        print(html_item, tab_frame)
+                            if "{{" in html_item[0]:
+                                data = ast._variables.get(tab_item.id)
+                                if data:
+                                    file_.write(f"{' '*tab_frame[-1]}{data}\n")
+                                    ast._variables.pop(tab_item.id)
+                                    break
+                            file_.write(f"{' '*tab_frame[-1]}{html_item[0]}\n")
+                            break
+                        elif html_item[1] == tab_item.close_id:
+                            print(html_item, tab_frame)
+                            file_.write(f"{' '*tab_frame[-1]}{html_item[0]}\n")
+                            break
+                    except:
+                        ...
 
 
         file_.write("</html>\n")
