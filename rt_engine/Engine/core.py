@@ -40,6 +40,17 @@ class AstDataNode:
         return f"DataNode: {{{{{self.value}}}}}"
 
 
+class AstTextNode:
+    def __init__(self, data):
+        self.value = data
+        self.id = None
+        self.child = []
+    
+    def __repr__(self) -> str:
+        return f"DataNode: {{{{{self.value}}}}}"
+
+
+
 class AstQueue:
     def __init__(self):
         self.queue: list = []
@@ -136,7 +147,6 @@ class Ast:
                         except:
                             pass
                     self._html_stack.append([item, item_code])
-
 
         return (self._first_parrent, self.__queue_tree_item, self.__raw_wood_temp)
 

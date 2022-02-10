@@ -82,7 +82,6 @@ class Writer:
                 for tab_item in tab_frame[0 : -1]:
                     try:
                         if html_item[1] == tab_item.id:
-    #                        print(html_item, tab_frame)
                             if "{{" in html_item[0]:
                                 data = ast._variables.get(tab_item.id)
                                 if data:
@@ -92,7 +91,6 @@ class Writer:
                             file_.write(f"{' '*tab_frame[-1]}{html_item[0]}\n")
                             break
                         elif html_item[1] == tab_item.close_id:
-                            print(html_item, tab_frame)
                             file_.write(f"{' '*tab_frame[-1]}{html_item[0]}\n")
                             break
                     except:
